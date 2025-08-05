@@ -1,5 +1,4 @@
-#Utilisation d'une base de données sur un échantillon d'assurés
-#adresse https://raw.githubusercontent.com/spitakiss/Data607_Pres1/master/FullCoverage.csv
+#Utilisation d'une base de donnÃ©es sur un Ã©chantillon d'assurÃ©s
 
 #library(Deducer)
 library(caret)
@@ -7,7 +6,7 @@ library(ROCR)
 library(pROC)
 library(readxl)
 library(aod)
-couverture <- read_excel("C:/économétrie/LogitModel/couverture d'assurance.xlsx")
+couverture <- read_excel("Ã©conomÃ©trie/LogitModel/couverture d'assurance.xlsx")
 View(couverture)
 
 #Variables
@@ -40,15 +39,15 @@ plot
 
 
 
-#Modèle logit, ROC, AUC base globale
+#ModÃ¨le logit, ROC, AUC base globale
 logit_g <- step(glm(y~men+urban+private+marital+age+seniority,data=couverture,family=binomial))
 summary(logit_g)
 summary(logit_g)$coefficient
 
 library(aod)
-## Intervalle de confiance des paramètres
+## Intervalle de confiance des paramÃ¨tres
 ci=confint(logit_g)
-#Testde significativité globale
+#Testde significativitÃ© globale
 wald.test(b = coef(logit_g), Sigma = vcov(logit_g), Terms = 2:6)
 #ODD Ratio
 or=exp(coef(logit_g))
@@ -62,13 +61,8 @@ roc_ful_g<-rocplot(logit_g)
 roc_ful_g
 
 
-
-
-
-
-
 #library pROC
-prob=predict(logit_g,couverture,type = "response") #Calcul des probabilité
+prob=predict(logit_g,couverture,type = "response") #Calcul des probabilitÃ©
 couverture$prob<-prob
 roc_g<-roc(couverture$y, couverture$prob,print.auc=TRUE,ci=TRUE,boot.n=1000,smooth=FALSE)
 plot(roc_g,grid=TRUE)
@@ -84,7 +78,7 @@ perf_rocr_g <- performance(pred_g, measure = "tpr", x.measure = "fpr") #courbe r
 perf_lift1_g <- performance(pred_g, measure = "lift", x.measure = "rpp") #courbe de Lift
 perf_lift2_g <- performance(pred_g, measure = "tpr", x.measure = "rpp") #courbe de Lift
 perf_auc_g <- performance(pred_g, measure = "auc") #AUC
-perf_mat_g <- performance(pred_g, measure = "mat") #Ceofficient de corrélation de Matthews
+perf_mat_g <- performance(pred_g, measure = "mat") #Ceofficient de corrÃ©lation de Matthews
 
 plot(perf_rocr_g,main="Courbe ROC",col="blue",xlab="Taux des faux positif",ylab="Taux des vraix positif")
 abline(0,1,col="gray",lty=2)
@@ -94,22 +88,18 @@ text(0.5,0.7,paste("AUC = ",round(perf_auc_g@y.values[[1]],digits = 3)))
 plot(perf_lift1_g,main="Courbe de Lift",xlab="RPP",ylab="Taux des Vraix Positifs")
 plot(perf_lift2_g,main="Courbe de Lift",xlab="RPP",ylab="Taux des Vraix Positifs",col="red")
 segments(0,0,1,1,col="blue")
-plot(perf_mat_g,main="Coefficient de corrélation de Mathews",col="blue",cex.main=1.1,xlab="Seuil")
+plot(perf_mat_g,main="Coefficient de corrÃ©lation de Mathews",col="blue",cex.main=1.1,xlab="Seuil")
 prediction<-as.numeric(pred_g@predictions[[1]]>=0.289)
 confusionMatrix(couverture$y,prediction)
 
 #Machine Learning
 
-
-
-
-#Sélection d'un échantillon  correspondant à 75% de la base
+#SÃ©lection d'un Ã©chantillon  correspondant Ã  75% de la base
 train_id=sample(4000,3000)
 data_train=couverture[train_id,]#Base Train
 data_test=couverture[-train_id,]#Base test
-#Estimation du modèle
+#Estimation du modÃ¨le
 logit <- step(glm(y~men+urban+private+factor(marital)+age+seniority,data=data_train,family=binomial))
-
 summary(logit)
 #roc plot using Deducer library
 roc_ful<-rocplot(logit)
@@ -130,9 +120,9 @@ perf_lift1_test <- performance(pred_test, measure = "lift", x.measure = "rpp") #
 perf_lift2_test <- performance(pred_test, measure = "tpr", x.measure = "rpp") #courbe de Lift
 auc_test <- performance(pred_test, measure = "auc") 
 #mettre les deux ROC
-plot(perf_roc_train, col="blue", main="Courbe ROC", xlab="1-Spécificité (fpr)", ylab="Sensibilité (tpr)",
+plot(perf_roc_train, col="blue", main="Courbe ROC", xlab="1-SpÃ©cificitÃ© (fpr)", ylab="SensibilitÃ© (tpr)",
      bg="white",cex.main=2,cex.lab=1,print.cutoffs.at=seq(0,1,by=0.1),lwd=3) 
-abline(0, 1,col="green",lty=3) #rajout d'une première bisectrice
+abline(0, 1,col="green",lty=3) #rajout d'une premiÃ¨re bisectrice
 
 #rajout de la courbe ROC pour la base test
 lines(perf_roc_test@x.values[[1]],perf_roc_test@y.values[[1]],col="red",lwd=2) 
@@ -141,7 +131,7 @@ text(1,.15,labels=paste("__ test,  AUC = ",round(auc_test@y.values[[1]],digits=3
 
 
 #mettre les deux de Lift ensemble
-plot(perf_lift1_train, col="blue", main="Courbe de Lift", xlab="RPP", ylab="Sensibilité (tpr)",
+plot(perf_lift1_train, col="blue", main="Courbe de Lift", xlab="RPP", ylab="SensibilitÃ© (tpr)",
      bg="white",cex.main=1,cex.lab=1,lwd=3) 
 
 lines(perf_lift1_test@x.values[[1]],perf_lift1_test@y.values[[1]],col="red",lwd=2) 
@@ -151,7 +141,7 @@ text(1,.15,labels="__ test",adj=1,col = "red")
 
 
 #mettre les deux de Lift ensemble
-plot(perf_lift2_train, col="blue", main="Courbe de Lift", xlab="RPP", ylab="Sensibilité (tpr)",
+plot(perf_lift2_train, col="blue", main="Courbe de Lift", xlab="RPP", ylab="SensibilitÃ© (tpr)",
      bg="white",cex.main=1,cex.lab=1,lwd=3) 
 
 lines(perf_lift2_test@x.values[[1]],perf_lift2_test@y.values[[1]],col="red",lwd=2) 
@@ -160,10 +150,10 @@ text(1,.15,labels="__ test",adj=1,col = "red")
 segments(0,0,1,1)
 
 perf <- performance(pred_train, "mat")
-plot(perf,main="Coeffcicient de corrélation de Matthews",xlab="Seuil",ylab="Corrélation")
+plot(perf,main="Coeffcicient de corrÃ©lation de Matthews",xlab="Seuil",ylab="CorrÃ©lation")
 abline(v=seuil)
 
-#Calcul du AUC trapézoide
+#Calcul du AUC trapÃ©zoide
 tpr<-perf_roc_test@y.values[[1]]
 fpr<-perf_roc_test@x.values[[1]]
 
@@ -185,7 +175,7 @@ tpr_train<-perf_roc_train@y.values[[1]]
 View(roc)
 library(ggplot2)
 ggplot(data=NULL, aes(x=fpr))+
-  labs(title="Courbe ROC",x="Taux des faux positifs (1-Spécificité)",y="Taux des vraix positifs (Sensibilité") +                    
+  labs(title="Courbe ROC",x="Taux des faux positifs (1-SpÃ©cificitÃ©)",y="Taux des vraix positifs (SensibilitÃ©") +                    
   geom_line(aes(y=tpr), colour="red",size=1.1) + # Sans remise 
   geom_line(aes(y=fpr), colour="blue",size=1.1)+
   theme(plot.title = element_text(size = rel(2),colour = "blue",hjust = 0.5))+
@@ -206,7 +196,7 @@ auc_proc2=auc(roc2)
 text(0,.05,labels=paste("AUC (Base Train) = ",round(auc_proc2,digits=3),sep=""),adj=1,col = "blue")
 
 
-#réseau de neurones
+#rÃ©seau de neurones
 library(nnet)
 nnet <- nnet(y~men+urban+private+factor(marital)+age+seniority,data=data_train,family=binomial,size=2)
 
@@ -218,12 +208,12 @@ perf_auc_nn_train <- performance(pred_nn_train, measure = "auc")
 perf_lift2_nn_train <- performance(pred_nn_train, measure = "lift", x.measure = "rpp")
 perf_lift1_nn_train <- performance(pred_nn_train, measure = "tpr", x.measure = "rpp")
 #Courbe de ROC
-plot(perf_roc_nn_train,main="Courbe ROC Réseau de neurônes",col="blue")
+plot(perf_roc_nn_train,main="Courbe ROC RÃ©seau de neurÃ´nes",col="blue")
 text(0.5,.7,paste("AUC - NN = ",round(perf_auc_nn_train@y.values[[1]],3)),col="blue",cex=0.75)
 segments(0,0,1,1,lty=3,col="green")
 #Courbe de Lift
-plot(perf_lift2_nn_train,main="Courbe de Lift Réseau de neurônes")
-plot(perf_lift1_nn_train,main="Courbe de Lift Réseau de neurônes",col="blue",grid=TRUE)
+plot(perf_lift2_nn_train,main="Courbe de Lift RÃ©seau de neurÃ´nes")
+plot(perf_lift1_nn_train,main="Courbe de Lift RÃ©seau de neurÃ´nes",col="blue",grid=TRUE)
 segments(0,0,1,1,lty=3)
 abline(h=.69,col="red",lty=3)
 text(0.15,0.75, "TPR = 0.69",col=250)
@@ -274,6 +264,7 @@ perf_lift2_lasso_test<-performance(yhat_test,"lift","rpp")
 plot(perf_lift2_lasso_test)
 abline(h=1.725,lty=3,col="red")
 abline(v=0.4,lty=3,col="red")
+
 
 
 
