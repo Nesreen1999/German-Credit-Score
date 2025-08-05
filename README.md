@@ -1,2 +1,2 @@
 # German-Credit-Score
-Predictive model to assess the credit solvency of clients. 
+The objective is to estimate the probability that the customer would be credit worthy.
